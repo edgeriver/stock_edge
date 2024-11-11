@@ -185,7 +185,8 @@ ORDER BY 2 DESC;
 -- stock.涨停演绎 source
 
 CREATE VIEW stock."涨停演绎" AS SELECT *
-FROM(SELECT "股票名称", "股票代码", "日期", "开盘", "收盘", "涨跌幅", CASE WHEN (("涨跌幅" >= 10)) THEN (lag("收盘", 1 IGNORE NULLS) OVER (PARTITION BY "股票代码"
+FROM(SELECT "股票名称", "股票代码", "日期", "开盘", "收盘", "涨跌幅",
+ CASE WHEN (("涨跌幅" >= 10)) THEN (lag("收盘", 1 IGNORE NULLS) OVER (PARTITION BY "股票代码"
 ORDER BY "日期"))
 ELSE NULL
 END AS "前收盘"

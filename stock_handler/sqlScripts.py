@@ -4,6 +4,21 @@ CREATE SCHEMA IF NOT EXISTS indicators;
 DROP SCHEMA IF EXISTS myschema CASCADE;
 CREATE SCHEMA IF NOT EXISTS myschema;
 use  myschema;
+
+create table industry_trend as 
+select 行业板块,count(股票代码) as stock_amount FROM read_parquet('./src/all_realtime.parquet')
+where 涨跌幅>0 and 行业板块 is not null
+group by 行业板块
+order by 2 desc;
+
+create table stock_inno as 
+select *  FROM read_parquet('./src/inno.parquet');
+
+create table stock_daily as 
+select *  FROM read_parquet('./src/all_realtime.parquet');
+
+'''
+init_indicator2='''
 CREATE table  myschema.trade_trend as(
 select * 
 from (
@@ -40,24 +55,9 @@ and lag(收盘,2,NULL)over(f )>lag(收盘,1,NULL)over(f )
 THEN -1
 else 0 end as growth_trend,
 FROM  read_parquet('./src/stock_data_15min.parquet') t1
--- where 日期 between '2023-11-01' and '2024-01-08 14:30:00'
 window  f as (partition by 股票代码 order by 日期 asc)
 ) t1);
 
-create table industry_trend as 
-select 行业板块,count(股票代码) as stock_amount FROM read_parquet('./src/all_realtime.parquet')
-where 涨跌幅>0 and 行业板块 is not null
-group by 行业板块
-order by 2 desc;
-
-create table stock_inno as 
-select *  FROM read_parquet('./src/inno.parquet');
-
-create table stock_daily as 
-select *  FROM read_parquet('./src/all_realtime.parquet');
-
-'''
-init_indicator2='''
 CREATE table  myschema.trade_trend_daily as(
 select * 
 from (
@@ -245,6 +245,7 @@ FROM myschema.trade_trend
 window f as (partition by 股票代码 order by 日期 rows between 19 preceding and current row ))
 window  f as (partition by 股票代码 order by 日期 asc))
 where date_rn=1 and 支持线>0)'''
+
 macd_model_calculation ='''DROP TABLE IF EXISTS  indicators.ema;
 DROP TABLE IF EXISTS  indicators.stock_macd_12_26_10;
 create table indicators.ema as(
@@ -321,19 +322,23 @@ read_parquet('./src/stock_chip_plate.parquet');
 
 stocks_analysis='''
 use  myschema;
-select * from myschema.stock_daily t
-where 股票代码 in(
-SELECT 股票代码 from  quant_data.stock.StockHistRankQueryDaily(sub_day:=90)
-where historical_close_rank<0.2 and 涨跌幅<0 and stock_drn=1 and 日期=current_date()
-)
-and 股票代码 in(select 股票代码 from read_parquet('./src/realtime.parquet'))
+SELECT * from  quant_data.stock.StockHistRankQueryDaily(sub_day:=90) t
+where historical_close_rank<0.4   and stock_drn=1 
 and 股票代码=any(
 SELECT 股票代码 from quant_data.stock.StockLimitUp(trade_day:=120)
 )
 and (股票代码 like '60%' OR 股票代码 like '00%')
-
-and 最新价<any(SELECT 前收盘
+and 收盘<any(SELECT 前收盘
 FROM quant_data.stock.涨停演绎 where t.股票代码 =股票代码 )
-
+and 股票代码=any(
+select 股票代码 from myschema.stock_daily 
+where  最新价<21
+and 负债率<60
+and 滚动市盈率>0
+and 动态市盈率>0
+and 流通市值<20000000000
+)
+and 股票代码 in(SELECT 股票代码 from  quant_data.stock.StockHistRankQueryDaily(sub_day:=250) t
+where historical_close_rank<0.3  and stock_drn=1 )
 
 '''

@@ -72,7 +72,9 @@ WHERE("日期" = ANY(SELECT DISTINCT "日期"
 FROM quant_data.stock.stock_data_daily
 ORDER BY "日期" DESC
 LIMIT trade_day))
-GROUP BY 1) AS t1 QUALIFY (percent_rank() OVER (
+GROUP BY 1) AS t1
+where "涨停">0
+QUALIFY (percent_rank() OVER (
 ORDER BY "涨停") > 0.5)
 ORDER BY 2 DESC;
 

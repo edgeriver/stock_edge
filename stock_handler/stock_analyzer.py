@@ -184,25 +184,26 @@ class StockAnalyzer:
         filtered_realtime_stock_info.to_parquet('./src/realtime.parquet')
         if extract_all:
             filtered_realtime_stock_info = realtime_stock_info
-        stock_data_15min = self.get_quote_history(filtered_realtime_stock_info,days_to_subtract,15)
         stock_data_daily = self.get_quote_history(filtered_realtime_stock_info, days_to_subtract, 101)
-        fund_flow_history=self.get_history_bill_multi(filtered_realtime_stock_info,3,ktl=101,return_df=True)
-        fund_flow_minute = self.get_history_bill_multi(filtered_realtime_stock_info, 3, ktl=15, return_df=True)
-        stock_intraday_volume = self.get_history_bill_multi(filtered_realtime_stock_info, 3, ktl=200, return_df=True)
-        stock_chip_plate = self.get_history_bill_multi(filtered_realtime_stock_info, 3, ktl=300, return_df=True)
+        # stock_data_15min = self.get_quote_history(filtered_realtime_stock_info,days_to_subtract,15)
+        # fund_flow_history=self.get_history_bill_multi(filtered_realtime_stock_info,3,ktl=101,return_df=True)
+        # fund_flow_minute = self.get_history_bill_multi(filtered_realtime_stock_info, 3, ktl=15, return_df=True)
+        # stock_intraday_volume = self.get_history_bill_multi(filtered_realtime_stock_info, 3, ktl=200, return_df=True)
+        # stock_chip_plate = self.get_history_bill_multi(filtered_realtime_stock_info, 3, ktl=300, return_df=True)
         # 保存数据到 Parquet 文件和 Excel 文件
 
 
         realtime_stock_info.to_parquet('./src/all_realtime.parquet')
         inno_company_info.to_parquet('./src/inno.parquet')
 
-        stock_data_15min.to_parquet('./src/stock_data_15min.parquet')
         stock_data_daily.to_parquet('./src/stock_data_daily.parquet')
-        stock_intraday_volume.to_parquet('./src/stock_intraday_volume.parquet')
-        stock_chip_plate.to_parquet('./src/stock_chip_plate.parquet')
+        # stock_data_15min.to_parquet('./src/stock_data_15min.parquet')
 
-        fund_flow_history.to_parquet('./src/fund_flow_history.parquet')
-        fund_flow_minute.to_parquet('./src/fund_flow_minute.parquet')
+        # stock_intraday_volume.to_parquet('./src/stock_intraday_volume.parquet')
+        # stock_chip_plate.to_parquet('./src/stock_chip_plate.parquet')
+        #
+        # fund_flow_history.to_parquet('./src/fund_flow_history.parquet')
+        # fund_flow_minute.to_parquet('./src/fund_flow_minute.parquet')
 
 
         # database_handler = DuckDBHandler()
