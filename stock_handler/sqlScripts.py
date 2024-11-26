@@ -322,12 +322,16 @@ read_parquet('./src/stock_chip_plate.parquet');
 
 stocks_analysis='''
 use  myschema;
-SELECT * from  quant_data.stock.StockHistRankQueryDaily(sub_day:=90) t
-where historical_close_rank<0.4   and stock_drn=1 
+SELECT * from  quant_data.stock.StockHistRankQueryDaily(start_date:='2024-09-01') t
+where  stock_drn=1 
+and historical_close_rank<0.3 
 and 股票代码=any(
 SELECT 股票代码 from quant_data.stock.StockLimitUp(trade_day:=120)
 )
-and (股票代码 like '60%' OR 股票代码 like '00%')
+
+and 股票代码 in(select 股票代码
+from quant_data.stock.StockTurnoverData(nrow:=9)
+where stock_drn=1 and 换手率<Avg_Turnover_Rate-Turnover_StdDev)
 and 收盘<any(SELECT 前收盘
 FROM quant_data.stock.涨停演绎 where t.股票代码 =股票代码 )
 and 股票代码=any(
@@ -337,8 +341,9 @@ and 负债率<60
 and 滚动市盈率>0
 and 动态市盈率>0
 and 流通市值<20000000000
+and (股票代码 like '60%' OR 股票代码 like '00%')
 )
-and 股票代码 in(SELECT 股票代码 from  quant_data.stock.StockHistRankQueryDaily(sub_day:=250) t
-where historical_close_rank<0.3  and stock_drn=1 )
-
+ORDER BY  historical_close_rank asc
+-- and 股票代码 in(SELECT 股票代码 from  quant_data.stock.StockHistRankQueryDaily(start_date:='2024-09-01') t
+-- where historical_close_rank<0.3  and stock_drn=1 )
 '''

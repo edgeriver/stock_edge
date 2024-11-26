@@ -186,7 +186,7 @@ class StockAnalyzer:
             filtered_realtime_stock_info = realtime_stock_info
         stock_data_daily = self.get_quote_history(filtered_realtime_stock_info, days_to_subtract, 101)
         # stock_data_15min = self.get_quote_history(filtered_realtime_stock_info,days_to_subtract,15)
-        # fund_flow_history=self.get_history_bill_multi(filtered_realtime_stock_info,3,ktl=101,return_df=True)
+        fund_flow_history=self.get_history_bill_multi(filtered_realtime_stock_info,3,ktl=101,return_df=True)
         # fund_flow_minute = self.get_history_bill_multi(filtered_realtime_stock_info, 3, ktl=15, return_df=True)
         # stock_intraday_volume = self.get_history_bill_multi(filtered_realtime_stock_info, 3, ktl=200, return_df=True)
         # stock_chip_plate = self.get_history_bill_multi(filtered_realtime_stock_info, 3, ktl=300, return_df=True)
@@ -202,7 +202,7 @@ class StockAnalyzer:
         # stock_intraday_volume.to_parquet('./src/stock_intraday_volume.parquet')
         # stock_chip_plate.to_parquet('./src/stock_chip_plate.parquet')
         #
-        # fund_flow_history.to_parquet('./src/fund_flow_history.parquet')
+        fund_flow_history.to_parquet('./src/fund_flow_history.parquet')
         # fund_flow_minute.to_parquet('./src/fund_flow_minute.parquet')
 
 
